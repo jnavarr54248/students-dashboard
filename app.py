@@ -200,5 +200,8 @@ def actualizar_graficos(prep, gender, eth):
     return fig1, fig2, fig3, fig4, fig5, fig6, fig7, fig8, fig9
 
 # Ejecutar app
+# Para Render (gunicorn espera un objeto llamado "app")
+application = app
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    application.run(debug=True)
