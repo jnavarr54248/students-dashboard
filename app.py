@@ -22,7 +22,7 @@ df['race/ethnicity'] = df['race/ethnicity'].replace({
 # Inicializar app
 app = dash.Dash(__name__, external_stylesheets=["https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"])
 app.title = "Dashboard Educativo - Profesional"
-server = app.server
+server = app.server  # Para que gunicorn pueda servir la app
 
 # Estilo para tarjetas KPI
 def tarjeta_kpi(titulo, valor, color):
@@ -199,9 +199,6 @@ def actualizar_graficos(prep, gender, eth):
 
     return fig1, fig2, fig3, fig4, fig5, fig6, fig7, fig8, fig9
 
-# Ejecutar app
-# Para Render (gunicorn espera un objeto llamado "app")
-application = app
-
+# Ejecutar localmente
 if __name__ == '__main__':
-    application.run(debug=True)
+    app.run(debug=True)

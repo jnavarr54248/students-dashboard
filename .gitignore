@@ -1,4 +1,21 @@
+# Python
 __pycache__/
-*.pyc
-.env
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Entornos
 .venv/
+.env
+.env.*
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# IDEs comunes
+.vscode/
+.idea/
