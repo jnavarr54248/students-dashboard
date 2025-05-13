@@ -20,9 +20,10 @@ df['race/ethnicity'] = df['race/ethnicity'].replace({
 })
 
 # Inicializar app
-app = dash.Dash(__name__, external_stylesheets=["https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"])
+app = dash.Dash(__name__, external_stylesheets=[
+    "https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+])
 app.title = "Dashboard Educativo - Profesional"
-server = app.server  # Para que gunicorn pueda servir la app
 
 # Estilo para tarjetas KPI
 def tarjeta_kpi(titulo, valor, color):
@@ -49,7 +50,8 @@ app.layout = html.Div([
             'display': 'block'
         })
     ]),
-    html.H1("📊 Dashboard Educativo - Rendimiento de Estudiantes - Semillero de Investigación ONTARE", style={'textAlign': 'center', 'fontFamily': 'Inter, sans-serif'}),
+    html.H1("📊 Dashboard Educativo - Rendimiento de Estudiantes - Semillero de Investigación ONTARE",
+            style={'textAlign': 'center', 'fontFamily': 'Inter, sans-serif'}),
     html.P("Explora cómo el género, el entorno socioeconómico y la preparación previa influyen en el desempeño académico.",
            style={'textAlign': 'center', 'padding': '0 50px', 'fontFamily': 'Inter, sans-serif'}),
 
@@ -130,7 +132,7 @@ def actualizar_kpis(prep, gender, eth):
         tarjeta_kpi("Puntaje Promedio en Escritura", filtro['writing_score'].mean(), '#d62728')
     ]
 
-# Callback para los gráficos
+# Callback para gráficos
 @app.callback(
     [Output('scatter-graph', 'figure'),
      Output('box-plot', 'figure'),
@@ -199,6 +201,6 @@ def actualizar_graficos(prep, gender, eth):
 
     return fig1, fig2, fig3, fig4, fig5, fig6, fig7, fig8, fig9
 
-# Ejecutar localmente
+# Solo ejecutar localmente
 if __name__ == '__main__':
     app.run(debug=True)
