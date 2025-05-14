@@ -118,3 +118,77 @@ app.layout = html.Div([
         'fontSize': '14px'
     })
 ])
+
+@app.callback(
+    Output('kpis', 'children'),
+    Input('prep-course', 'value'),
+    Input('gender-radio', 'value'),
+    Input('ethnicity-dropdown', 'value')
+)
+def actualizar_kpis(prep, gender, eth):
+    filtro = df[(df['test_preparation_course'] == prep) & (df['gender'] == gender) & (df['race/ethnicity'] == eth)]
+    return [
+        tarjeta_kpi("Puntaje Promedio en Matemáticas", filtro['math_score'].mean(), '#1f77b4'),
+        tarjeta_kpi("Puntaje Promedio en Lectura", filtro['reading_score'].mean(), '#2ca02c'),
+        tarjeta_kpi("Puntaje Promedio en Escritura", filtro['writing_score'].mean(), '#d62728')
+    ]
+
+@app.callback(
+    Output('scatter-graph', 'figure'),
+    Output('box-plot', 'figure'),
+    Output('bar-graph', 'figure'),
+    Output('histogram-graph', 'figure'),
+    Output('heatmap-graph', 'figure'),
+    Output('radar-graph', 'figure'),
+    Output('pie-graph', 'figure'),
+    Output('violin-graph', 'figure'),
+    Output('line-graph', 'figure'),
+    Input('prep-course', 'value'),
+    Input('gender-radio', 'value'),
+    Input('ethnicity-dropdown', 'value')
+)
+def actualizar_graficos(prep, gender, eth):
+    filtro = df[(df['test_preparation_course'] == prep) & (df['gender'] == gender) & (df['race/ethnicity'] == eth)]
+
+    fig1 = px.scatter(filtro, x="math_score", y="reading_score", color="parental_level_of_education", size="writing_score", hover_data=['lunch'], template="plotly_white", title="📐 Matemáticas vs Lectura")
+    fig2 = px.box(filtro, x="parental_level_of_education", y="writing_score", color="parental_level_of_education", template="plotly_white", title="✍️ Escritura por Nivel Educativo de Padres")
+    barras = df[(df['gender'] == gender) & (df['test_preparation_course'] == prep)]
+    fig3 = px.bar(barras.groupby('race/ethnicity')[['math_score', 'reading_score', 'writing_score']].mean().reset_index(), x='race/ethnicity', y=['math_score', 'reading_score', 'writing_score'], barmode='group', template="plotly_white", title="📊 Puntajes por Grupo Socioeconómico")
+    fig4 = px.histogram(filtro, x="math_score", nbins=20, color="parental_level_of_education", template="plotly_white", title="📊 Distribución de Matemáticas")
+    fig5 = px.imshow(df[["math_score", "reading_score", "writing_score"]].corr(), text_auto=True, color_continuous_scale='Viridis', title="🔍 Correlación entre Puntajes", template="plotly_white")
+    radar_df = filtro[['math_score', 'reading_score', 'writing_score']].mean()
+    fig6 = go.Figure()
+    fig6.add_trace(go.Scatterpolar(r=radar_df.values, theta=radar_df.index, fill='toself'))
+    fig6.update_layout(polar=dict(radialaxis=dict(visible=True)), showlegend=False, title="📈 Comparación Radar")
+    pie_df = filtro['parental_level_of_education'].value_counts().reset_index()
+    pie_df.columns = ['Nivel educativo', 'Cantidad']
+    fig7 = px.pie(pie_df, values='Cantidad', names='Nivel educativo', template="plotly_white", title="🧠 Nivel Educativo de Padres")
+    fig8 = px.violin(df[df['test_preparation_course'] == prep], x="gender", y="reading_score", color="gender", box=True, points="all", template="plotly_white", title="📚 Lectura por Género")
+    linea_df = df[df['test_preparation_course'] == prep].groupby("parental_level_of_education")[["math_score", "reading_score", "writing_score"]].mean().reset_index()
+    fig9 = px.line(linea_df, x="parental_level_of_education", y=["math_score", "reading_score", "writing_score"], markers=True, template="plotly_white", title="📉 Tendencias por Educación Parental")
+    return fig1, fig2, fig3, fig4, fig5, fig6, fig7, fig8, fig9
+
+@app.callback(
+    Output('conclusiones', 'children'),
+    Input('prep-course', 'value'),
+    Input('gender-radio', 'value'),
+    Input('ethnicity-dropdown', 'value')
+)
+def generar_conclusiones(prep, gender, eth):
+    filtro = df[(df['test_preparation_course'] == prep) & (df['gender'] == gender) & (df['race/ethnicity'] == eth)]
+    if filtro.empty:
+        return "No hay datos disponibles para los filtros seleccionados."
+    avg_math = filtro['math_score'].mean()
+    avg_read = filtro['reading_score'].mean()
+    avg_write = filtro['writing_score'].mean()
+    curso = "con preparación" if prep == "completed" else "sin preparación"
+    genero = "mujeres" if gender == "female" else "hombres"
+    return html.Div([
+        html.H4("📌 Conclusiones del análisis:", style={'fontWeight': '600'}),
+        html.P(f"Los estudiantes seleccionados son {genero} del grupo '{eth}' que están {curso}.", style={'marginBottom': '10px'}),
+        html.P(f"Presentan un puntaje promedio de {avg_math:.1f} en matemáticas, {avg_read:.1f} en lectura y {avg_write:.1f} en escritura."),
+        html.P("Se observa una tendencia en la que el rendimiento en lectura y escritura suele ser más alto que en matemáticas, lo cual puede estar influenciado por factores socioeconómicos o el nivel educativo de los padres.")
+    ])
+
+if __name__ == '__main__':
+    app.run(debug=True)
