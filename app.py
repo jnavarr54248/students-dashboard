@@ -48,7 +48,7 @@ app.layout = html.Div([
         'display': 'block'
     }),
 
-    html.H1("📊 Dashboard Educativo - Rendimiento de Estudiantes", style={'textAlign': 'center', 'fontFamily': 'Inter, sans-serif'}),
+    html.H1("📊 Semillero de Investigación ONTARE - Dashboard Educativo - Rendimiento de Estudiantes", style={'textAlign': 'center', 'fontFamily': 'Inter, sans-serif'}),
     html.P("Explora cómo el género, el entorno socioeconómico y la preparación previa influyen en el desempeño académico.",
            style={'textAlign': 'center', 'padding': '0 50px', 'fontFamily': 'Inter, sans-serif'}),
 
@@ -95,7 +95,15 @@ app.layout = html.Div([
         dcc.Graph(id='pie-graph'),
         dcc.Graph(id='violin-graph'),
         dcc.Graph(id='line-graph')
-    ])
+    ]),
+
+    html.Footer("Juan Camilo Navarro Herrera - Estudiante de Maestría en Ciencia de Datos", style={
+        'textAlign': 'center',
+        'padding': '20px',
+        'fontFamily': 'Inter, sans-serif',
+        'color': '#555',
+        'fontSize': '14px'
+    })
 ])
 
 # Callbacks
